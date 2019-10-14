@@ -1,6 +1,21 @@
 import json
+
+#import obspy.core.event.base.CreationInfo
+#import obspy.core.event.origin.Pick
+#import obspy.core.event.origin.Origin
+#import obspy.core.event.magnitude.Magnitude
+#import obspy.core.event.event.EventDescription
+#import obspy.core.event.source.FocalMechanism
+#import obspy.core.event.magnitude.Amplitude
+#import obspy.core.event.base.Comment
+#obspy.core.event.origin.Arrival
+#obspy.core.event.base.WaveformStreamID
+
+import obspy
 from obspy.core import read
 from obspy.io.nordic.core import read_nordic
+from obspy.io.nordic.core import write_select
+from obspy.io.nordic.core import nordpick
 #from quakenet.data_io import load_catalog
 from obspy.core.utcdatetime import UTCDateTime
 import argparse
@@ -54,7 +69,13 @@ class Catalog():
                 print ("[preprocessing metadata] \033[91m ERROR!!\033[0m Cannot process metadata sfile "+os.path.join(input_metadata_dir, metadata_file))
                 sys.exit(0)
 
+            obspyCatalogMeta.events.append(full_test_event())
+            write_select (obspyCatalogMeta, os.path.join(input_metadata_dir, "select.out"))
+
             for event in obspyCatalogMeta.events:
+                print("fake event")
+                #event = full_test_event()
+                print(event)
                 eventOriginTime = obspyCatalogMeta.events[0].origins[0].time
                 lat = event.origins[0].latitude
                 lon = event.origins[0].longitude
@@ -69,12 +90,34 @@ class Catalog():
                 e = Event(eventOriginTime, lat, lon, depth, mag, eventid)
                 self.events.append(e)
                 print("APPEND")
+                print(event.origins[0])
+                print(nordpick(event))
+                
+
+                print("picks:")
+                print(event.picks)
                 for pick in event.picks:
-                    if pick.phase_hint == 'P':
-                        station_code = pick.waveform_id.station_code
-                        d = Detection(station_code, pick.time)
-                        e.detections.append(d)
-                        print(pick.waveform_id.get_seed_string())
+                    print(pick)
+
+                
+                print("arrivals:")
+                print(event.origins[0].arrivals)
+                for arrival in event.origins[0].arrivals:
+                    print(arrival)
+                    #station_code = pick.waveform_id.station_code
+
+
+                #    if pick.phase_hint == 'P':
+                #        station_code = pick.waveform_id.station_code
+                #        d = Detection(station_code, pick.time)
+                #        e.detections.append(d)
+                #        print(pick.waveform_id.get_seed_string())
+                
+
+
+
+
+
                 #for comment in sobspyCatalogMeta.events[0].comment:
                 #    print("COMMENT:"+comment)
 
@@ -210,6 +253,79 @@ class Detection():
     def __init__(self, station, ptime):
         self.station = station
         self.ptime = ptime
+
+def full_test_event():
+    """
+    Function to generate a basic, full test event
+    """
+    test_event = obspy.core.event.event.Event()
+    test_event.origins.append(obspy.core.event.origin.Origin(
+        time=UTCDateTime("2012-03-26") + 1.2, latitude=45.0, longitude=25.0,
+        depth=15000))
+    test_event.event_descriptions.append(obspy.core.event.event.EventDescription())
+    test_event.event_descriptions[0].text = 'LE'
+    test_event.creation_info = obspy.core.event.base.CreationInfo(agency_id='TES')
+    test_event.magnitudes.append(obspy.core.event.magnitude.Magnitude(
+        mag=0.1, magnitude_type='ML', creation_info=obspy.core.event.base.CreationInfo('TES'),
+        origin_id=test_event.origins[0].resource_id))
+    test_event.magnitudes.append(obspy.core.event.magnitude.Magnitude(
+        mag=0.5, magnitude_type='Mc', creation_info=obspy.core.event.base.CreationInfo('TES'),
+        origin_id=test_event.origins[0].resource_id))
+    test_event.magnitudes.append(obspy.core.event.magnitude.Magnitude(
+        mag=1.3, magnitude_type='Ms', creation_info=obspy.core.event.base.CreationInfo('TES'),
+        origin_id=test_event.origins[0].resource_id))
+
+    # Define the test pick
+    _waveform_id_1 = obspy.core.event.base.WaveformStreamID(station_code='FOZ', channel_code='SHZ',
+                                      network_code='NZ')
+    _waveform_id_2 = obspy.core.event.base.WaveformStreamID(station_code='WTSZ', channel_code='BH1',
+                                      network_code=' ')
+    # Pick to associate with amplitude - 0
+    test_event.picks = [
+        obspy.core.event.origin.Pick(waveform_id=_waveform_id_1, phase_hint='IAML',
+             polarity='undecidable', time=UTCDateTime("2012-03-26") + 1.68,
+             evaluation_mode="manual"),
+        obspy.core.event.origin.Pick(waveform_id=_waveform_id_1, onset='impulsive', phase_hint='PN',
+             polarity='positive', time=UTCDateTime("2012-03-26") + 1.68,
+             evaluation_mode="manual"),
+        obspy.core.event.origin.Pick(waveform_id=_waveform_id_1, phase_hint='IAML',
+             polarity='undecidable', time=UTCDateTime("2012-03-26") + 1.68,
+             evaluation_mode="manual"),
+        obspy.core.event.origin.Pick(waveform_id=_waveform_id_2, onset='impulsive', phase_hint='SG',
+             polarity='undecidable', time=UTCDateTime("2012-03-26") + 1.72,
+             evaluation_mode="manual"),
+        obspy.core.event.origin.Pick(waveform_id=_waveform_id_2, onset='impulsive', phase_hint='PN',
+             polarity='undecidable', time=UTCDateTime("2012-03-26") + 1.62,
+             evaluation_mode="automatic")]
+    # Test a generic local magnitude amplitude pick
+    test_event.amplitudes = [
+        obspy.core.event.magnitude.Amplitude(generic_amplitude=2.0, period=0.4,
+                  pick_id=test_event.picks[0].resource_id,
+                  waveform_id=test_event.picks[0].waveform_id, unit='m',
+                  magnitude_hint='ML', category='point', type='AML'),
+        obspy.core.event.magnitude.Amplitude(generic_amplitude=10,
+                  pick_id=test_event.picks[1].resource_id,
+                  waveform_id=test_event.picks[1].waveform_id, type='END',
+                  category='duration', unit='s', magnitude_hint='Mc',
+                  snr=2.3),
+        obspy.core.event.magnitude.Amplitude(generic_amplitude=5.0, period=0.6,
+                  pick_id=test_event.picks[2].resource_id,
+                  waveform_id=test_event.picks[0].waveform_id, unit='m',
+                  category='point', type='AML')]
+    test_event.origins[0].arrivals = [
+        obspy.core.event.origin.Arrival(time_weight=0, phase=test_event.picks[1].phase_hint,
+                pick_id=test_event.picks[1].resource_id),
+        obspy.core.event.origin.Arrival(time_weight=2, phase=test_event.picks[3].phase_hint,
+                pick_id=test_event.picks[3].resource_id,
+                backazimuth_residual=5, time_residual=0.2, distance=15,
+                azimuth=25, takeoff_angle=10),
+        obspy.core.event.origin.Arrival(time_weight=2, phase=test_event.picks[4].phase_hint,
+                pick_id=test_event.picks[4].resource_id,
+                backazimuth_residual=5, time_residual=0.2, distance=15,
+                azimuth=25, takeoff_angle=170)]
+
+    return test_event
+
 
 if __name__ == "__main__":
     print ("\033[92m******************** CATALOG TOOL *******************\033[0m ")

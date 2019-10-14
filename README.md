@@ -13,3 +13,7 @@ From the root of the github repo:
 	nordic2json \
 	--input_path output/sfiles_nordicformat \
 	--output_path output/catalog.json
+
+	nordic2json \
+	--input_path output/arrival_times.txt \
+	--output_path output/catalog.json

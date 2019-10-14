@@ -12,7 +12,7 @@ setuptools.setup(
 	author_email='rtous@ac.upc.edu',
 	license='MIT',
     packages=setuptools.find_packages(),
-    scripts=['bin/nordic2json'],
+    scripts=['bin/nordic2json', 'bin/util_bigsfile2sfiles'],
     install_requires=[
           'obspy==1.1.1',
           'pandas==0.25.1'
