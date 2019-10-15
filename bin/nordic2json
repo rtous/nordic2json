@@ -17,7 +17,7 @@ if __name__ == "__main__":
     c = catalog.Catalog()
     for input_path in args.input_path:
         print("Importing "+input_path)
-        c.import_sfiles(input_path)
+        c.import_sfile(input_path)
     c.export_json(args.output_path)
 
 

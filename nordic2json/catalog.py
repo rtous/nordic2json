@@ -32,6 +32,89 @@ class Catalog():
 
     def __init__(self):
         self.events = []
+
+    def import_sfile(self, input_path):
+        #obspyCatalogMeta = seisobs.seis2cat(os.path.join(input_metadata_dir, metadata_file)) 
+        try:
+            obspyCatalogMeta = read_nordic(input_path)
+        except Exception as e:
+            print(e)
+            track = traceback.format_exc()
+            print(track)
+            sys.exit()
+
+        print("done")
+        print(str(obspyCatalogMeta))
+
+        if len(obspyCatalogMeta.events) == 0 :
+            print ("[preprocessing metadata] \033[91m ERROR!!\033[0m Cannot process metadata sfile "+input_path)
+            sys.exit(0)
+
+        #obspyCatalogMeta.events.append(full_test_event())
+        write_select (obspyCatalogMeta, "select_debug.out")
+
+        for event in obspyCatalogMeta.events:
+            print("fake event")
+            #event = full_test_event()
+            print(event)
+            eventOriginTime = obspyCatalogMeta.events[0].origins[0].time
+            lat = event.origins[0].latitude
+            lon = event.origins[0].longitude
+            depth = event.origins[0].depth
+            if len(event.magnitudes) > 0:
+                mag = event.magnitudes[0].mag
+            else:
+                mag = -1 #TODO
+            #cluster = nearest_centroid_model.predict([[lat, lon]])[0]
+            #e = Event(eventOriginTime, lat, lon, depth, mag, cluster)
+            eventid = event.resource_id.id
+            e = Event(eventOriginTime, lat, lon, depth, mag, eventid)
+            self.events.append(e)
+            print("APPEND")
+            print(event.origins[0])
+            print(nordpick(event))
+            
+
+            print("picks:")
+            print(event.picks)
+            for pick in event.picks:
+                print(pick)
+
+            
+            print("arrivals:")
+            print(event.origins[0].arrivals)
+            for arrival in event.origins[0].arrivals:
+                print(arrival)
+                #station_code = pick.waveform_id.station_code
+
+
+            #    if pick.phase_hint == 'P':
+            #        station_code = pick.waveform_id.station_code
+            #        d = Detection(station_code, pick.time)
+            #        e.detections.append(d)
+            #        print(pick.waveform_id.get_seed_string())
+            
+
+
+
+
+
+            #for comment in sobspyCatalogMeta.events[0].comment:
+            #    print("COMMENT:"+comment)
+
+            #print("ID:")
+            #print obspyCatalogMeta.events[0].resource_id.id
+            #print obspyCatalogMeta.events[0].event_descriptions
+            #for desc in obspyCatalogMeta.events[0].event_descriptions:
+            #    print("DESC:"+str(desc.text))
+            #print("CATALOG:"+obspyCatalogMeta.description)
+            #print("COMMENTS:")
+            #for ccomment in obspyCatalogMeta.comments:
+            #    print("ccomment:"+ccomment)
+            #print("CATALOG:"+obspyCatalogMeta.description)
+            #print obspyCatalogMeta.resource_id.get_referred_object()
+            #print obspyCatalogMeta.creation_info.agency_uri
+
    
     def import_sfiles(self, input_metadata_dir):
         #This imports a nordic format sfile into our own catalog object
@@ -70,7 +153,7 @@ class Catalog():
                 sys.exit(0)
 
             obspyCatalogMeta.events.append(full_test_event())
-            write_select (obspyCatalogMeta, os.path.join(input_metadata_dir, "select.out"))
+            write_select (obspyCatalogMeta, os.path.join(input_metadata_dir, "select_debug.out"))
 
             for event in obspyCatalogMeta.events:
                 print("fake event")
