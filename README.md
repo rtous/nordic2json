@@ -31,7 +31,7 @@ From the root of the github repo:
 	--output_path output/catalog.json
 
 	nordic2json \
-	--input_path input/raw \
+	--input_path input/1_carabobo_select.out \
 	--output_path output/catalog.json
 
 PROBLEMA: linia amb el waveform/tracedate file
