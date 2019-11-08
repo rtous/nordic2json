@@ -8,13 +8,23 @@ This repository provides tools to convert a file formatted in Nordic into a JSON
 
 ## Functionality
 
+The repository is designed to provide a command line tool (nordic2json). With simply running "pip install ." from the root of the repository the command "nordic2json" will be available. This is accomplished through the [Command Line Scripts(https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html) functionality of the python native packaging consisting on:
 
+- Place the python package within a directory of the repo root directory (including the __init__.py file).
+- Include a setup.py file at the root of the repo specifying the scripts. 
+- Place the python scripts within a bin directory of the repo root directory. They should include the "#!/usr/bin/env python" header.
 
 ## Prerequisites
 
-Currently ObsPy parses Nordic file format into its own, quite complete, objets model. So, it's not necessary anymore to develop neither a Nordic format parser nor a objects model.
+The repository has been created with Python 3.7 and has not been tested with previous versions.
 
-## Installing the package locally
+It is convenient to activate a python virtual environment before installing the package:
+
+	python3 -m venv VirtualEnvs/myVirtualEnv
+	source VirtualEnvs/myVirtualEnv/bin/activate
+
+
+## Installation
 
 From the root of the github repo:
 
