@@ -12,7 +12,7 @@ This repository provides tools to convert a file formatted in Nordic into a JSON
 
 ## Functionality
 
-The repository is designed to provide a command line tool (nordic2json). With simply running "pip install ." from the root of the repository the command "nordic2json" will be available. This is accomplished through the [Command Line Scripts(https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html) functionality of the python native packaging consisting on:
+The repository is designed to provide a command line tool (nordic2json). With simply running "pip install ." from the root of the repository the command "nordic2json" will be available. This is accomplished through the [Command Line Scripts](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html) functionality of the python native packaging consisting on:
 
 - Place the python package within a directory of the repo root directory (including the __init__.py file).
 - Include a setup.py file at the root of the repo specifying the scripts. 
@@ -26,8 +26,7 @@ It is convenient to activate a python virtual environment before installing the 
 
 	python3 -m venv VirtualEnvs/myVirtualEnv
 	source VirtualEnvs/myVirtualEnv/bin/activate
-
-
+	
 ## Installation
 
 From the root of the github repo:
